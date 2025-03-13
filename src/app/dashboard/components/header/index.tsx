@@ -8,14 +8,14 @@ export function Header(){
 
   async function handleLogout() {
     'use server'
-    cookies().delete("session") 
+    cookies().delete("auth") 
   }
 
   return(
     <header className={styles.headerContainer}>
       <div className={styles.headerContent}>
         <Link href="/dashboard">
-          <img src="/logo.svg" width={190} height={60} alt="Sujeito Pizza"/>
+          <img src="/logo.png" width={200} height={90} alt="DevPizza"/>
         </Link>
 
         <nav>
