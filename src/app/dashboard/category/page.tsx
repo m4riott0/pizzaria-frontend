@@ -1,57 +1,57 @@
-import { api } from '@/services/api';
-import styles from './page.module.scss'
-import { redirect } from 'next/navigation';
-import { getCookieServer } from '@/utils/cookieServer';
-import Button from '../components/button';
+import styles from './styles.module.scss'
+import { Button } from "@/app/dashboard/components/button"
+import { api } from '@/services/api'
+import { redirect } from 'next/navigation'
+import { getCookieServer } from '@/lib/cookieServer'
 
-export default function Category() {
-
+export default function Category(){
 
   async function handleRegisterCategory(formData: FormData){
     "use server"
-
+    
     const name = formData.get("name")
-    if(name === ''){
-      return;
-    }
 
-    const token = getCookieServer();
+    if(name === "") return;
 
     const data = {
       name: name,
     }
 
-    await api.post('/category', data, {
+    const token = getCookieServer();
+
+    await api.post("/category", data, {
       headers:{
         Authorization: `Bearer ${token}`
       }
     })
     .catch((err) => {
-      console.log(err)
+      console.log(err);
+      return;
     })
 
-    redirect('/dashboard')  
+    redirect("/dashboard")
 
   }
 
- return (
-   <>
+
+  return(
     <main className={styles.container}>
-      <h1>Cadastrar categoria</h1>
+      <h1>Nova Categoria</h1>
+
       <form 
-        className={styles.form} 
+        className={styles.form}
         action={handleRegisterCategory}
       >
         <input 
-          className={styles.input}
-          type="text" 
-          placeholder="Nome da categoria"
+          type="text"
           name="name"
+          placeholder="Nome da categoria, ex: Pizzas"
           required
+          className={styles.input}
         />
+
         <Button name="Cadastrar" />
-        </form>
+      </form>
     </main>
-   </>
- );
+  )
 }

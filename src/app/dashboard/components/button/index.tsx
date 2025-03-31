@@ -1,13 +1,18 @@
 "use client"
 
-import { useFormStatus } from "react-dom";
 import styles from './styles.module.scss'
+import { useFormStatus } from 'react-dom'
 
-export default function Button({ name }: { name: string }) {
-  const { pending } = useFormStatus()
- return (
-  <button type="submit" disabled={pending} className={styles.button}>
-    {pending ? "Carregando..." : name}
-  </button>
- );
+interface Props{
+  name: string;
+}
+
+export function Button({ name }: Props){
+  const { pending } = useFormStatus();
+
+  return (
+    <button type="submit" disabled={pending} className={styles.button}>
+     {pending  ? "Carregando..." : name}
+    </button>
+  )
 }

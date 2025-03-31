@@ -1,4 +1,3 @@
-
 .headerContainer{
   height: 5rem;
 }
@@ -13,9 +12,6 @@
   align-items: center;
   justify-content: space-between;
 
-  img {
-    cursor: pointer;
-  }
 
   nav{
     display: flex;
@@ -24,22 +20,25 @@
 
     a{
       color: var(--white);
+      text-decoration: none;
       transition: color .8s;
-      
+
       &:hover{
         color: var(--red-900);
       }
     }
-  }
 
-  button{
-    margin-left: 16px;
-    background: transparent;
-    border:0;
-    transition: transform 0.9s;
+    button{
+      border:0;
+      background: transparent;
+      margin-left: 16px;
+      transition: transform 0.5s;
 
-    &:hover{
-      transform: scale(1.2);
+      &:hover{
+        transform: scale(1.2);
+      }
     }
+
+
   }
 }

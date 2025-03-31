@@ -1,84 +1,86 @@
-import Image from 'next/image';
-import styles from '../page.module.scss';
+import Image from "next/image"
+import Link from "next/link"
+import styles from '../page.module.scss'
+import logoImg from '/public/logo.png'
+import { api } from '@/services/api'
+import { redirect } from 'next/navigation'
 
-import logoImg from '/public/logo.png';
-
-import Link from 'next/link';
-import { cookies } from 'next/headers';
-import { redirect } from "next/navigation";
-import { api } from '@/services/api';
-
-
-export default function Signup() {
+export default function Signup(){
 
   async function handleRegister(formData: FormData){
     "use server"
-    
+
     const name = formData.get("name")
     const email = formData.get("email")
     const password = formData.get("password")
 
-    if(name === '' || email === '' || password === ''){
+    if( name === "" || email === "" || password === ""){
+      console.log("PREENCHA TODOS OS CAMPOS")
       return;
     }
 
     try{
-      await api.post('/users', {
-        name: name,
+      await api.post("/users", {
+        name,
         email,
         password
       })
-  
+
     }catch(err){
+      console.log("error")
       console.log(err)
     }
 
     redirect("/")
   }
 
-  return (
+  return(
     <>
-    <div className={styles.containerCenter}>
-      <Image src={logoImg} alt="Logo Sujeito Pizzaria" />
+      <div className={styles.containerCenter}>
+        <Image
+          src={logoImg}
+          alt="Logo da pizzaria"
+        />
 
-      <div className={styles.login}>
-        <h1>Criando sua conta</h1>
-        <form action={handleRegister} >
-          <input
-            placeholder="Digite o nome completo"
-            className={styles.input}
-            name="name"
-            required
-          />
+        <section className={styles.login}>
+          <h1>Criando sua conta</h1>
+          <form action={handleRegister}>
+            <input 
+              type="text"
+              required
+              name="name"
+              placeholder="Digite seu nome..."
+              className={styles.input}
+            />
 
-          <input
-            placeholder="Digite seu email"
-            className={styles.input}
-            type="email"
-            name="email"
-            required
-          />
+            <input 
+              type="email"
+              required
+              name="email"
+              placeholder="Digite seu email..."
+              className={styles.input}
+            />
 
-          <input
-            placeholder="Digite sua senha..."
-            className={styles.input}
-            type="password"
-            name="password"
-            required
-          />
-          
-          <button type="submit" className={styles.button}>
-            Cadastrar
-          </button>
-        </form>
-        
-        <Link href="/" className={styles.text}>
-           Já possui uma conta? Faça o login
-        </Link>
+            <input 
+              type="password"
+              required
+              name="password"
+              placeholder="***********"
+              className={styles.input}
+            />
 
-      </div>
-    </div>
+            <button type="submit" className={styles.button}>
+              Cadastrar
+            </button>
+          </form>
+
+          <Link href="/" className={styles.text}>
+            Já possui uma conta? Faça o ligin
+          </Link>
+
+        </section>
+
+      </div> 
     </>
   )
 }
-

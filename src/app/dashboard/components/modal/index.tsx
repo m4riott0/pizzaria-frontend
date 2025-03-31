@@ -1,59 +1,61 @@
+"use client"
 
-"use client";
-
-import { X } from "lucide-react";
 import styles from './styles.module.scss'
-import { api } from "@/services/api";
-import { use } from "react";
-import { OrderContext } from "@/providers/order";
+import { X } from 'lucide-react'
+import { use } from 'react'
+import { OrderContext } from '@/providers/order'
+import { calculateTotalOrder } from '@/lib/helper'
 
-export function ModalOrder() {
-  const { onRequestClose, order, handleFinishOrder } = use(OrderContext);
+export function Modalorder(){
+  const { onRequestClose, order, finishOrder } = use(OrderContext);
 
-  async function handleFinish(id: string) {
-    await handleFinishOrder(id)
+  async function handleFinishOrder(){
+    await finishOrder(order[0].order.id)
   }
 
+  return(
+    <dialog className={styles.dialogContainer}>
 
-  if(order.length === 0) return null;  
+     <section className={styles.dialogContent}>
+        <button className={styles.dialogBack} onClick={onRequestClose}>
+          <X size={40} color="#FF3f4b" />
+        </button>
 
-  return (
-    <>
-    <dialog
-      className={styles.dialogContainer}
-    >
-      <div className={styles.dialogContent}>
-          <button 
-            onClick={onRequestClose}
-            className={styles.dialogBack}
-          >
-            <X size={40} color="#FF3F4B"/>
+        <article className={styles.container}>
+          <h2>Detalhes do pedido</h2>
+
+          <span className={styles.table}>
+            Mesa <b>{order[0].order.table}</b>
+          </span>
+
+          {order[0].order?.name && (
+          <span className={styles.name}>
+            <b>{order[0].order.name}</b>
+          </span>
+          )}
+
+          {order.map( item => (
+          <section className={styles.item} key={item.id}>
+            <span>
+              Qtd: {item.amount} - <b>{item.product.name}</b> - R$ {parseFloat(item.product.price) * item.amount}
+            </span>
+            <span className={styles.description}>
+              {item.product.description}
+            </span>
+          </section>             
+          ))}  
+
+
+          <h3 className={styles.total}>Valor total: R$ {calculateTotalOrder(order)}</h3>    
+
+          <button className={styles.buttonOrder} onClick={handleFinishOrder}>
+            Concluir pedido
           </button>
 
-          <div className={styles.container}>
-            <h2>Detalhes do pedido</h2>
-            <span className={styles.table}>
-              Mesa: <strong>{order[0].order.table}</strong>
-            </span>
+        </article>
 
-            {order.map( item => (
-            <section key={item.id} className={styles.containerItem}>
-              <span>{item.amount} - <strong>{item.product.name}</strong></span>
-              <span className={styles.description}>{item.product.description}</span>
-            </section>
-            ))}
+     </section>
 
-            <button 
-              className={styles.buttonOrder} 
-              onClick={ () => handleFinish(order[0].order.id) }
-            >
-              Concluir pedido
-            </button>
-
-          </div>
-        </div>
-      </dialog>
-    </>
-    );
+    </dialog>
+  )
 }
-

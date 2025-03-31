@@ -1,47 +1,46 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getCookieServer } from '@/lib/cookieServer'
+import { api } from "@/services/api"
 
-import { NextRequest, NextResponse } from 'next/server';
-import { api } from './services/api';
-import { getCookieServer } from './utils/cookieServer';
+export async function middleware(req: NextRequest){
+  const { pathname } = req.nextUrl
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-
-  // Permitir acesso público para a página de login e recursos estáticos
-  if (pathname.startsWith('/_next') || pathname === '/login') {
+  if(pathname.startsWith("/_next") || pathname === "/"){
     return NextResponse.next();
   }
-  
-  // Verificar o token de autenticação para as rotas protegidas
+
   const token = getCookieServer();
-
-  if (pathname.startsWith('/dashboard')) {
-    if (!token) {
-      return NextResponse.redirect(new URL('/', req.url));
+  
+  if(pathname.startsWith("/dashboard")){
+    if(!token){
+      return NextResponse.redirect(new URL("/", req.url))
     }
 
-    // Verificar o token com a API
-    const valid = await validateToken(token);
-    if (!valid) {
-      return NextResponse.redirect(new URL('/', req.url));
+    const isValid = await validateToken(token)
+    console.log(isValid);
+
+    if(!isValid){
+      return NextResponse.redirect(new URL("/", req.url))
     }
-  } 
+  }
 
   return NextResponse.next();
+
 }
 
-async function validateToken(token: string): Promise<boolean> {
+
+async function validateToken(token: string){
   if (!token) return false;
 
-  try {
-      await api.get('/me', {
-          headers: {
-              Authorization: `Bearer ${token}`
-          }
-      })
+  try{
+    await api.get("/me", {
+      headers:{
+        Authorization: `Bearer ${token}`
+      }
+    })
 
-      return true;
-
-  } catch (err) {
-      return false;
+    return true;
+  }catch(err){
+    return false;
   }
 }

@@ -1,100 +1,114 @@
 "use client"
+import { createContext, ReactNode, useState } from 'react'
+import { api } from '@/services/api'
+import { getCookieClient } from '@/lib/cookieClient'
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation'
 
-import { api } from "@/services/api";
-import { getCookieClient } from "@/utils/cookieClient";
-import { useRouter } from "next/navigation";
-import { createContext, ReactNode, useState } from "react";
-import { toast } from "sonner";
-
-interface OrderItemProps {
+export interface OrderItemProps{
   id: string;
   amount: number;
+  created_at: string;
   order_id: string;
   product_id: string;
   product:{
     id: string;
     name: string;
-    description: string;
     price: string;
-  }
+    description: string;
+    banner: string;
+    category_id: string;
+  };
   order:{
     id: string;
-    table: string;
-    status: boolean;
+    table: number;
     name: string | null;
+    draft: boolean;
+    status: boolean;
   }
-};
-
-type OrderContextData = { 
-  order: OrderItemProps[];
-  isOpen: boolean;
-  onRequestClose: () => void;
-  onRequestOpen: (orderId: string, token: string) => Promise<void>;
-  handleFinishOrder: (orderId: string) => Promise<void>;
 }
 
-type AuthProviderProps = {
+type OrderContextData = {
+  isOpen: boolean;
+  onRequestOpen: (order_id: string) => Promise<void>;
+  onRequestClose: () => void;
+  order: OrderItemProps[];
+  finishOrder: (order_id: string) => Promise<void>;
+}
+
+type OrderProviderProps = {
   children: ReactNode;
-};
+}
 
-export const OrderContext = createContext({} as OrderContextData);
+export const OrderContext = createContext({} as OrderContextData)
 
-export function OrderProvider({children}: AuthProviderProps){
-  const [order, setOrder] = useState<OrderItemProps[]>([]);
+export function OrderProvider({ children }: OrderProviderProps){
   const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter()
+  const [order, setOrder] = useState<OrderItemProps[]>([])
+  const router = useRouter();
 
-  function onRequestClose(){
-    setIsOpen(false);
-    setOrder([])
-  }
+  async function onRequestOpen(order_id: string){
+    // console.log(order_id);
 
-  async function onRequestOpen(orderId: string, token: string){
-    if(!orderId || !token) return;
+    const token = getCookieClient();
 
-    const response = await api.get('/order/detail', {
-      headers: {
+    const response = await api.get("/order/detail", {
+      headers:{
         Authorization: `Bearer ${token}`
       },
       params:{
-        order_id: orderId,
-      },
-    })
-
-    setOrder(response.data)
-    setIsOpen(true);
-  }
-
-  async function handleFinishOrder(orderId: string){
-    const token = getCookieClient();
-    // console.log(token)
-
-    const data = {
-      order_id: orderId,
-    }
-    await api.put('/order/finish', data, {
-      headers:{
-        Authorization: `Bearer ${token}`
+        order_id: order_id
       }
     })
 
+    setOrder(response.data);
+    setIsOpen(true);
+
+  }
+
+  function onRequestClose(){
+    setIsOpen(false);
+  }
+
+
+  async function finishOrder(order_id: string){
+    const token = getCookieClient();
+
+    const data = {
+      order_id: order_id,
+    }
+
+    try{
+      await api.put("/order/finish", data, {
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      })
+    }catch(err){
+      console.log(err);
+      toast.error("Falha ao finalizar este pedido!")
+      return;
+    }
+
     toast.success("Pedido finalizado com sucesso!")
-    router.refresh()
-    onRequestClose();
+    router.refresh();
+    setIsOpen(false);
+
   }
 
   return(
-    <OrderContext.Provider
-     value={{ 
-      order, 
-      isOpen,
-      onRequestClose,
-      onRequestOpen,
-      handleFinishOrder
-    }}
+    <OrderContext.Provider 
+      value={{ 
+        isOpen,
+        onRequestOpen,
+        onRequestClose,
+        finishOrder,
+        order
+      }}
     >
       {children}
     </OrderContext.Provider>
   )
-
 }
+
+

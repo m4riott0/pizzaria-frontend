@@ -1,60 +1,65 @@
 "use client"
-import { RefreshCcw } from 'lucide-react';
-import styles from './styles.module.scss'
-import { OrderProps } from "@/utils/order.type";
-import { ModalOrder } from '../modal';
-import { use } from 'react';
-import { OrderContext } from '@/providers/order';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
-export function Orders({ orders, token }: { orders: OrderProps[], token: string }) {
-  const { onRequestOpen, isOpen } = use(OrderContext)
+import { use } from 'react'
+import styles from './styles.module.scss'
+import { RefreshCw } from 'lucide-react'
+import { OrderProps } from '@/lib/order.type'
+import { Modalorder } from '@/app/dashboard/components/modal'
+import { OrderContext } from '@/providers/order'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+
+interface Props{
+  orders: OrderProps[]
+}
+
+export function Orders({ orders }: Props){
+  const { isOpen, onRequestOpen } = use(OrderContext)
   const router = useRouter();
 
-  async function handleDetailOrder(orderId: string){
-    await onRequestOpen(orderId, token)
+  async function handleDetailOrder(order_id: string){
+    await onRequestOpen(order_id)
   }
 
-  async function handleRefreshItems(){
-    toast.success("Atualizando lista de pedidos.")
-    router.refresh()
+  function handleRefresh(){
+    router.refresh();
+    toast.success("Pedidos atualizados com sucesso!")
   }
-  
- return (
+
+  return(
   <>
-  <main className={styles.container}>
-    <div className={styles.containerHeader}>
-      <h1>Últimos pedidos</h1>
-      <button onClick={handleRefreshItems}>
-        <RefreshCcw size={25} color="#3FFFA3"/>
-      </button>
-    </div>
-    
+    <main className={styles.container}>
 
-    <section className={styles.listOrders}>
-      {orders.length === 0 && (
-        <span className={styles.emptyList}>
-          Nao temos nenhum pedido ainda.
-        </span>
-      )}
-
-      {orders.map( item => (
-        <button 
-          key={item.id} 
-          className={styles.orderItem}
-          onClick={() => handleDetailOrder(item.id)}
-        >
-          <div className={styles.tag}></div>
-          <span>Mesa {item.table}</span>
+      <section className={styles.containerHeader}>
+        <h1>Últimos pedidos</h1>
+        <button onClick={handleRefresh}>
+          <RefreshCw size={24} color="#3fffa3" />
         </button>
-      ))}
-    
-    </section>
+      </section>
 
-  </main>
+      <section className={styles.listOrders}>
+        {orders.length === 0 && (
+          <span className={styles.emptyItem}>
+            Nenhum pedido aberto no momento...
+          </span>
+        )}
 
-  {isOpen && <ModalOrder/> }
+
+        {orders.map( order => (
+          <button
+            key={order.id}
+            className={styles.orderItem}
+            onClick={ () => handleDetailOrder(order.id)}
+          >
+            <div className={styles.tag}></div>
+            <span>Mesa {order.table}</span>
+          </button>  
+        ))}
+      </section>
+     
+    </main>
+
+    { isOpen && <Modalorder/> }
   </>
- );
+  )
 }
