@@ -1,36 +1,39 @@
-Aqui está o conteúdo formatado:
-
----
-
 # Pizzaria Frontend
 
-## Tecnologias
+## Tecnologias Utilizadas
 
-- [React.js](w) / [Next.js](w)
-- [TypeScript](w)
-- [Styled Components](w) / [Tailwind CSS](w)
-- [Axios](w)
-- [Zustand](w) / [Context API](w)
+- React.js / Next.js  
+- TypeScript  
+- Styled Components / Tailwind CSS  
+- Axios  
+- Zustand / Context API  
 
-## Instalação
+## Como Rodar o Projeto
+
+### 1. Clone o repositório
 
 ```bash
 git clone https://github.com/m4riott0/pizzaria-frontend.git
 cd pizzaria-frontend
+```
+
+### 2. Instale as dependências
+
+```bash
 npm install
 ```
 
-## Execução
+### 3. Inicie o servidor de desenvolvimento
 
 ```bash
 npm run dev
 ```
 
-Acesse: [http://localhost:3000](w)
+O frontend estará disponível em `http://localhost:3000`.
 
-## Licença
+### Licença
 
-[MIT](w)
+MIT
 
 ---
 
